@@ -4,6 +4,8 @@ namespace FilmesAPI.Models
 {
     public class Filme
     {
+        [Key] //chave de identificacao para mapeamento no BD
+        [Required]
         public int Id { get; set; }
         [Required (ErrorMessage = "The Title field is required.")] //campo requerido na request
         public string Titulo { get; set; }

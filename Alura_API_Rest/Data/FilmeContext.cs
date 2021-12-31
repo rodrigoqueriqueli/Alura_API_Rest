@@ -1,21 +1,24 @@
 ﻿using FilmesAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FilmesAPI.Data
+namespace FilmesApi.Data
 {
     /// <summary>
     /// Classe responsavel pela parte de contexto entre aplicacao (API) e o BD
     /// </summary>
     public class FilmeContext : DbContext
     {
-        //Set de dados do BD
-        //Filme objeto q quero mapear e acessar no BD
-        public DbSet<Filme> Filmes { get; set; } 
+        public FilmeContext(DbContextOptions<FilmeContext> opt) : base(opt)
+        {
 
-        //recebendo opcoes desse contexto
-        public FilmeContext(DbContextOptions<FilmeContext> dbContextOptions)  : base (dbContextOptions) //passando opcoes para o construtor do DbContext
-        {}
+        }
 
+        public FilmeContext()
+        {
+
+        }
+
+        public DbSet<Filme> Filmes { get; set; }
 
     }
 }

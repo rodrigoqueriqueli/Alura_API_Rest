@@ -1,8 +1,12 @@
-﻿using FilmesAPI.Data;
+﻿using FilmesApi.Data;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-namespace FilmesAPI
+namespace FilmesApi
 {
     public class Startup
     {
@@ -14,15 +18,12 @@ namespace FilmesAPI
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        //configurar service de acesso ao banco
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<FilmeContext>(optios => optios.UseMySQL(Configuration.GetConnectionString("FilmeConnection"))); //Add contexto de BD, passando options como parametro
+            services.AddDbContext<FilmeContext>(
+                options => options.UseMySQL(
+                    Configuration.GetConnectionString("FilmeConnection")));
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FilmesAPI", Version = "v1" });
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -31,8 +32,6 @@ namespace FilmesAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FilmesAPI v1"));
             }
 
             app.UseHttpsRedirection();
