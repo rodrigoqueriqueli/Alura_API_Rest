@@ -43,5 +43,40 @@ namespace FilmesAPI.Controllers
             else
                 return NotFound();
         }
+
+        //IActionResult pra retornar resultado da action executada 
+        //indico que vou receber id por parametro (url da request)
+        [HttpPut("{id}")] 
+        public IActionResult AtualizaFilme(int id, [FromBody] Filme filmeAtualizado)
+        {
+            var filme = _context.Filmes.FirstOrDefault(f => f.Id == id);
+
+            if (filme == null)
+                return NotFound();
+            else 
+            {
+                filme.Titulo = filmeAtualizado.Titulo;
+                filme.Diretor = filmeAtualizado.Diretor;
+                filme.Duracao = filmeAtualizado.Duracao;
+                filme.Genero = filmeAtualizado.Genero;
+                _context.SaveChanges(); //filme que foi recuperado e alterado, com o SaveChanges cravo
+                return NoContent(); //boa pratica de retorno quando feito o put
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeletaFilme(int id)
+        {
+            var filme = _context.Filmes.FirstOrDefault(f => f.Id == id);
+
+            if (filme == null)
+                return NotFound();
+            else
+            {
+                _context.Remove(filme);
+                _context.SaveChanges();
+                return NoContent(); //boa pratica de retorno quando feito o delete
+            }
+        }
     }
 }
