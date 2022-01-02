@@ -1,4 +1,5 @@
-﻿using FilmesApi.Data;
+﻿using AutoMapper;
+using FilmesApi.Data;
 using FilmesAPI.Data.Dtos;
 using FilmesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,12 @@ namespace FilmesAPI.Controllers
     public class FilmeController : ControllerBase
     {
         private FilmeContext _context;
+        private IMapper _mapper;
 
-        public FilmeController(FilmeContext context)
+        public FilmeController(FilmeContext context, IMapper mapper)
         {
-            _context = context; 
+            _context = context;
+            _mapper = mapper; //iniciar automapper
         }
 
         /// <summary>
@@ -25,13 +28,15 @@ namespace FilmesAPI.Controllers
         [HttpPost] //criando recurso novo no sistema
         public IActionResult AdicionaFilme([FromBody] CreateFilmeDto filmeDto)  //Filme que recebo vem do body da request
         {
-            Filme filme = new Filme()
-            {
-                Titulo = filmeDto.Titulo,
-                Genero = filmeDto.Genero,
-                Diretor = filmeDto.Diretor,
-                Duracao = filmeDto.Duracao
-            };
+            Filme filme = _mapper.Map<Filme>(filmeDto); //Converte pra filme apartir do dto
+
+            //Filme filme = new Filme()
+            //{
+            //    Titulo = filmeDto.Titulo,
+            //    Genero = filmeDto.Genero,
+            //    Diretor = filmeDto.Diretor,
+            //    Duracao = filmeDto.Duracao
+            //};
 
             _context.Filmes.Add(filme);
             _context.SaveChanges();
@@ -50,15 +55,7 @@ namespace FilmesAPI.Controllers
             var filme = _context.Filmes.FirstOrDefault(f => f.Id == id);
             if (filme != null)
             {
-                ReadFilmeDto filmeDto = new ReadFilmeDto()
-                {
-                    Diretor = filme.Diretor,
-                    Titulo = filme.Titulo,
-                    Duracao = filme.Duracao,
-                    Genero = filme.Genero,
-                    Id = filme.Id,
-                    MomentoDaConsulta = DateTime.Now
-                };
+                ReadFilmeDto filmeDto = _mapper.Map<ReadFilmeDto>(filme);
 
                 return Ok(filmeDto); //retorna 200 Ok com o filme
             }
@@ -76,15 +73,16 @@ namespace FilmesAPI.Controllers
 
             if (filme == null)
                 return NotFound();
-            else 
-            {
-                filme.Titulo = filmeASerAtualizadoDto.Titulo;
-                filme.Diretor = filmeASerAtualizadoDto.Diretor;
-                filme.Duracao = filmeASerAtualizadoDto.Duracao;
-                filme.Genero = filmeASerAtualizadoDto.Genero;
-                _context.SaveChanges(); //filme que foi recuperado e alterado, com o SaveChanges cravo
-                return NoContent(); //boa pratica de retorno quando feito o put
-            }
+
+            _mapper.Map(filmeASerAtualizadoDto, filme); //Converte(sobreescreve) filmeASerAtualizadoDto to filme
+
+            filme.Titulo = filmeASerAtualizadoDto.Titulo;
+            filme.Diretor = filmeASerAtualizadoDto.Diretor;
+            filme.Duracao = filmeASerAtualizadoDto.Duracao;
+            filme.Genero = filmeASerAtualizadoDto.Genero;
+            _context.SaveChanges(); //filme que foi recuperado e alterado, com o SaveChanges cravo
+            return NoContent(); //boa pratica de retorno quando feito o put
+
         }
 
         [HttpDelete("{id}")]
